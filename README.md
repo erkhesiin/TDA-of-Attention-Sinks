@@ -96,7 +96,7 @@ connector of sorts, linking distant tokens into a unified ring of
 context. In deeper layers (the "cone"), vertical bands of positive
 $\Delta H_1$ can be observed. 
 
-![Topological Atlas](staticopological_atlas.png)
+![Topological Atlas](./static/topological_atlas.png)
 
 Removing the sink here creates 
 loops, meaning that the sink acts as a suppressor to maintain
@@ -104,7 +104,7 @@ stable generation. The control atlas with random weights shows pure
 static, confirming that the function of the sink is a learned
 behavior, not an artifact.
 
-![Topological Atlas](staticontrol_atlas.png)
+![Topological Atlas](./static/control_atlas.png)
 
 #### Cone Mechanism (Induction Suppression)
 To understand the mechanics of the "cone," L19H0 was isolated. I
@@ -120,7 +120,7 @@ of the prompt. For example:
 - Token 12 ("quick") attends strongly to Token 3 ("brown").
 - Token 13 ("brown") attends strongly to Token 4 ("fox").
 
-![Skeleton (Masked)](statickeleton_plot_masked.png)
+![Skeleton (Masked)](./static/skeleton_plot_masked.png)
 
 To me, this confirms that the induction head is "cheating" by
 looking at a previous occurrence of the prompt and basing its 
@@ -133,7 +133,7 @@ I'm inferring that the model uses the sink to sever induction links,
 stopping the "cheating" and forcing the model to rely on generalized
 weights rather than rote copying.
 
-![Skeleton (Normal)](statickeleton_plot_normal.png)
+![Skeleton (Normal)](./static/skeleton_plot_normal.png)
 
 #### The Cost of Learning
 I took it a step further and tried my hand at investigating if 
@@ -148,7 +148,7 @@ huge amount of Topological Drift ($0.0 \to$ greater than
 $40.0$). In essence, the "bridge" collapsed and the "cone" was 
 lifted.
 
-![Curves](staticolution_curve_noreg.png)
+![Curves](./static/solution_curve_noreg.png)
 
 Using the proposed loss function ($\lambda=50.0$), the model
 wildly different. It showed an initial spike in resistance, 
@@ -156,7 +156,7 @@ attempting to break the structure, followed by a correction and
 plateau. After 60 steps, it had a low Task Loss ($\approx 1.0$) and
 maintained superbly low Topological Drift ($\approx 0.0$).
 
-![Curves](staticolution_curve_reg.png)
+![Curves](./static/solution_curve_reg.png)
 
 ## Discussion
 I'm going to be honest, I did this experiment as a fun little
