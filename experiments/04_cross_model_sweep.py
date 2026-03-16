@@ -601,9 +601,20 @@ def main() -> None:
                 )
                 agg_df = pd.read_csv(cached_atlas_path)
 
-                # Try to load cached control atlas too
+                # BUG FIX: always try to load a cached control atlas when use-cached is set.
+                # Previously this block was missing, so control_max_abs_delta was always NaN
+                # even when the control had been computed in a prior run.
                 ctrl_path = out_dir / "atlas_control.csv"
-                control_agg_df = pd.read_csv(ctrl_path) if ctrl_path.exists() else None
+                if ctrl_path.exists():
+                    control_agg_df = pd.read_csv(ctrl_path)
+                    log.info("Loaded cached control atlas: %s", ctrl_path)
+                else:
+                    control_agg_df = None
+                    log.warning(
+                        "No cached control atlas found at %s. "
+                        "Re-run without --use-cached or run with --no-control to suppress this warning.",
+                        ctrl_path,
+                    )
             else:
                 agg_df, control_agg_df = _run_atlas_for_model(
                     model_cfg=model_cfg,

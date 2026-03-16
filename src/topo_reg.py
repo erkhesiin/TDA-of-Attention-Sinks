@@ -636,35 +636,39 @@ def finetune(
     base_model.config.use_cache = False
 
     # --- Compute anchors (before LoRA wrapping) ---
+    # BUG FIX: always compute PD anchor diagrams regardless of condition.
+    # Previously no_reg skipped this entirely, making drift logging impossible.
+    # anchor_diagrams is now computed for all conditions so the drift metric
+    # is a fair comparison across no_reg / pd_reg / frob_reg.
     anchor_diagrams: dict = {}
     anchor_attns: dict = {}
 
-    if condition in ("pd_reg", "frob_reg"):
-        anchor_prompts = train_prompts[: min(5, len(train_prompts))]  # quick sample
-        if condition == "pd_reg":
-            anchor_diagrams = compute_anchor_diagrams(
-                base_model,
-                tokenizer,
-                anchor_prompts,
-                hub_heads,
-                max_filtration=max_filtration,
-                homology_dim=homology_dim,
-                min_persistence=min_persistence,
-            )
-        else:  # frob_reg: capture raw attention tensors as anchors
-            anchor_text = anchor_prompts[0]["text"]
-            mats = get_attention_matrices(
-                base_model,
-                tokenizer,
-                anchor_text,
-                layers=[layer_idx for layer_idx, _ in hub_heads],
-                heads=[h for _, h in hub_heads],
-            )
-            anchor_attns = {
-                k: torch.tensor(v, dtype=torch.float32)
-                for k, v in mats.items()
-                if k in {(layer_idx, h) for layer_idx, h in hub_heads}
-            }
+    anchor_prompts = train_prompts[: min(5, len(train_prompts))]
+    anchor_diagrams = compute_anchor_diagrams(
+        base_model,
+        tokenizer,
+        anchor_prompts,
+        hub_heads,
+        max_filtration=max_filtration,
+        homology_dim=homology_dim,
+        min_persistence=min_persistence,
+    )
+
+    if condition == "frob_reg":
+        # frob_reg additionally captures raw attention tensors as weight-space anchors
+        anchor_text = anchor_prompts[0]["text"]
+        mats = get_attention_matrices(
+            base_model,
+            tokenizer,
+            anchor_text,
+            layers=[layer_idx for layer_idx, _ in hub_heads],
+            heads=[h for _, h in hub_heads],
+        )
+        anchor_attns = {
+            k: torch.tensor(v, dtype=torch.float32)
+            for k, v in mats.items()
+            if k in {(layer_idx, h) for layer_idx, h in hub_heads}
+        }
 
     # --- Wrap with LoRA ---
     peft_config = LoraConfig(
@@ -708,7 +712,9 @@ def finetune(
 
         optimizer.zero_grad()
 
-        # Forward pass
+        # Forward pass — for no_reg we request attentions=False on the training
+        # pass (efficiency) and compute drift via a separate no_grad pass below.
+        # For regularized conditions we need attentions from this pass.
         task_out = model(
             **inputs,
             labels=inputs["input_ids"],
@@ -751,6 +757,27 @@ def finetune(
                         homology_dim=homology_dim,
                         min_persistence=min_persistence,
                     )
+
+        elif condition == "no_reg" and anchor_diagrams:
+            # BUG FIX: drift must be computed for no_reg too — previously always 0.0
+            # We need a separate forward pass with output_attentions=True just for
+            # drift logging (the training pass above used output_attentions=False).
+            with torch.no_grad():
+                drift_out = model(
+                    **inputs,
+                    labels=inputs["input_ids"],
+                    output_attentions=True,
+                )
+                if drift_out.attentions is not None:
+                    current_attns = _extract_hub_attentions(drift_out, hub_heads)
+                    if current_attns:
+                        topo_drift_val = topological_drift(
+                            current_attns,
+                            anchor_diagrams,
+                            max_filtration=max_filtration,
+                            homology_dim=homology_dim,
+                            min_persistence=min_persistence,
+                        )
 
         total_loss = task_loss + reg_loss
         total_loss.backward()
@@ -795,16 +822,18 @@ def finetune(
                         truncation=True,
                         max_length=max_length,
                     ).to(device)
+                    # Always request attentions so we can compute drift for all conditions
                     val_out = model(
                         **val_inputs,
                         labels=val_inputs["input_ids"],
-                        output_attentions=(condition != "no_reg"),
+                        output_attentions=True,
                     )
                     val_task_losses.append(val_out.loss.item())
 
-                    if condition != "no_reg" and val_out.attentions is not None:
+                    # BUG FIX: compute drift for ALL conditions, not just regularized ones
+                    if val_out.attentions is not None and anchor_diagrams:
                         curr_attns = _extract_hub_attentions(val_out, hub_heads)
-                        if curr_attns and anchor_diagrams:
+                        if curr_attns:
                             drift = topological_drift(
                                 curr_attns,
                                 anchor_diagrams,
