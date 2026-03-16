@@ -152,7 +152,21 @@ def compute_anchor_diagrams(
                 if key not in matrices:
                     continue
                 attn = matrices[key]
-                D = attention_to_distance(attn)
+
+                # ROOT CAUSE FIX: compute PD on the sink-MASKED attention matrix.
+                #
+                # With the sink active, attention is star-shaped (all rows point
+                # to token 0), so the VR distance graph is a tree — trees have no
+                # H1 cycles regardless of min_persistence. Lowering the threshold
+                # cannot fix this.
+                #
+                # The atlas computes ΔH1 = PD(unmasked) − PD(masked). Bridge heads
+                # are defined by PD(masked) having MORE cycles than PD(unmasked).
+                # So the cycles we want to preserve as anchors live in the MASKED
+                # state — that's what we anchor here.
+                from src.models import mask_sink  # noqa: PLC0415
+                attn_masked = mask_sink(attn, sink_idx=sink_idx)
+                D = attention_to_distance(attn_masked)
                 try:
                     diag = compute_persistence(
                         D,
@@ -484,13 +498,17 @@ def topological_drift(
     """
     from src.tda_pipeline import attention_to_distance, compute_persistence  # noqa
 
+    from src.models import mask_sink  # noqa: PLC0415
+
     drifts: list[float] = []
     for key, attn_tensor in current_attns.items():
         if key not in anchor_diagrams:
             continue
         try:
             attn_np = attn_tensor.detach().float().cpu().numpy()
-            D = attention_to_distance(attn_np)
+            # Use masked attention to match how anchors were computed
+            attn_masked = mask_sink(attn_np, sink_idx=0)
+            D = attention_to_distance(attn_masked)
             current_diag = compute_persistence(
                 D,
                 max_filtration=max_filtration,
@@ -665,7 +683,7 @@ def finetune(
     # full prompts; the 5-prompt anchor sample here often has short texts that
     # produce no cycles above that threshold.
     anchor_prompts = train_prompts[: min(10, len(train_prompts))]
-    anchor_min_persistence = min(min_persistence, 0.001)  # short CF prompts need very low threshold
+    anchor_min_persistence = min(min_persistence, 0.02)  # use masked attn so cycles exist; 0.02 is safe
     anchor_diagrams = compute_anchor_diagrams(
         base_model,
         tokenizer,
