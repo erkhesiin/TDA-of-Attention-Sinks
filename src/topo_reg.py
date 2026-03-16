@@ -423,10 +423,27 @@ def frobenius_loss(
             continue
         anc = anchor_attns[key]
         if isinstance(anc, np.ndarray):
-            anc = torch.tensor(anc, dtype=torch.float32, device=device)
+            anc_t = torch.tensor(anc, dtype=torch.float32, device=device)
         else:
-            anc = anc.to(device=device, dtype=torch.float32).detach()
-        total = total + torch.norm(curr.float() - anc, p="fro")
+            anc_t = anc.to(device=device, dtype=torch.float32).detach()
+
+        # FIX: anchor may be a 1-D mean-column vector (seq-length-independent form).
+        # Broadcast it to match the current attention matrix shape by expanding
+        # into a uniform matrix where every row equals the anchor distribution,
+        # interpolated to the current sequence length if needed.
+        seq_len = curr.shape[0]
+        if anc_t.dim() == 1:
+            anc_len = anc_t.shape[0]
+            if anc_len != seq_len:
+                # Interpolate anchor distribution to current seq length
+                anc_t = torch.nn.functional.interpolate(
+                    anc_t.view(1, 1, -1), size=seq_len, mode="linear", align_corners=False
+                ).view(seq_len)
+                anc_t = anc_t / (anc_t.sum() + 1e-9)
+            # Expand to (seq_len, seq_len): each row attends according to anchor dist
+            anc_t = anc_t.unsqueeze(0).expand(seq_len, -1)
+
+        total = total + torch.norm(curr.float() - anc_t, p="fro")
         n += 1
     if n == 0:
         return total.squeeze()
@@ -643,7 +660,12 @@ def finetune(
     anchor_diagrams: dict = {}
     anchor_attns: dict = {}
 
-    anchor_prompts = train_prompts[: min(5, len(train_prompts))]
+    # Use more prompts for anchors and a lower min_persistence so short sequences
+    # still produce surviving cycles.  The atlas used min_persistence=0.05 on
+    # full prompts; the 5-prompt anchor sample here often has short texts that
+    # produce no cycles above that threshold.
+    anchor_prompts = train_prompts[: min(10, len(train_prompts))]
+    anchor_min_persistence = min(min_persistence, 0.01)
     anchor_diagrams = compute_anchor_diagrams(
         base_model,
         tokenizer,
@@ -651,23 +673,39 @@ def finetune(
         hub_heads,
         max_filtration=max_filtration,
         homology_dim=homology_dim,
-        min_persistence=min_persistence,
+        min_persistence=anchor_min_persistence,
     )
 
     if condition == "frob_reg":
-        # frob_reg additionally captures raw attention tensors as weight-space anchors
-        anchor_text = anchor_prompts[0]["text"]
-        mats = get_attention_matrices(
-            base_model,
-            tokenizer,
-            anchor_text,
-            layers=[layer_idx for layer_idx, _ in hub_heads],
-            heads=[h for _, h in hub_heads],
-        )
+        # FIX: store per-head mean column-attention vector (shape: seq_len,) averaged
+        # over rows, then normalised — this is sequence-length-independent.
+        # The original code stored the full seq×seq matrix from one anchor prompt,
+        # which crashed when a training prompt had a different sequence length.
+        anchor_attns = {}
+        hub_set = {(layer_idx, h) for layer_idx, h in hub_heads}
+        for ap in anchor_prompts:
+            mats = get_attention_matrices(
+                base_model,
+                tokenizer,
+                ap["text"],
+                layers=[layer_idx for layer_idx, _ in hub_heads],
+                heads=[h for _, h in hub_heads],
+            )
+            for k, v in mats.items():
+                if k not in hub_set:
+                    continue
+                # Mean attention weight received by each relative position bucket.
+                # We store the mean across rows → shape (seq_len,), normalised.
+                mean_col = v.mean(axis=0)  # (seq_len,)
+                mean_col = mean_col / (mean_col.sum() + 1e-9)
+                if k not in anchor_attns:
+                    anchor_attns[k] = []
+                anchor_attns[k].append(mean_col)
+        # Average over anchor prompts; keep as 1-D numpy array (seq-length agnostic
+        # comparison happens in frobenius_loss via interpolation below)
         anchor_attns = {
-            k: torch.tensor(v, dtype=torch.float32)
-            for k, v in mats.items()
-            if k in {(layer_idx, h) for layer_idx, h in hub_heads}
+            k: np.mean(np.stack(vs, axis=0), axis=0).astype(np.float32)
+            for k, vs in anchor_attns.items()
         }
 
     # --- Wrap with LoRA ---

@@ -37,7 +37,8 @@ regularization:
                               # Pareto-optimal point between task loss and topology preservation.
   lambda_sweep: [1.0, 5.0, 10.0, 25.0]
   hub_selection: top_delta_h1 # select heads where |ΔH1| > hub_threshold
-  hub_threshold: 0.3
+  hub_threshold: 0.05         # FIX: was 0.3, but max observed |ΔH1| is ~0.095.
+                              # 0.05 selects the top ~28 heads without the fallback warning.
 
 fine_tuning:
   method: lora
