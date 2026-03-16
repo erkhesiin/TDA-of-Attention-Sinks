@@ -501,8 +501,16 @@ def topological_drift(
     from src.models import mask_sink  # noqa: PLC0415
 
     drifts: list[float] = []
+    n_skipped_empty = 0
     for key, attn_tensor in current_attns.items():
         if key not in anchor_diagrams:
+            continue
+        anchor_diag = anchor_diagrams[key]
+        # Skip heads whose anchor is empty — W2(something, empty) is not
+        # a meaningful drift metric; it just returns the mean lifetime of
+        # the current diagram regardless of how much topology has changed.
+        if len(anchor_diag) == 0:
+            n_skipped_empty += 1
             continue
         try:
             attn_np = attn_tensor.detach().float().cpu().numpy()
@@ -515,10 +523,16 @@ def topological_drift(
                 homology_dim=homology_dim,
                 min_persistence=min_persistence,
             )
-            w2 = _wasserstein_distance(current_diag, anchor_diagrams[key])
+            w2 = _wasserstein_distance(current_diag, anchor_diag)
             drifts.append(w2)
         except Exception as exc:
             logger.debug("Drift computation failed for %s: %s", key, exc)
+    if n_skipped_empty > 0:
+        logger.debug(
+            "topological_drift: skipped %d heads with empty anchors "
+            "(run with longer/repetition prompts to populate anchors)",
+            n_skipped_empty,
+        )
 
     return float(np.mean(drifts)) if drifts else 0.0
 
@@ -678,12 +692,13 @@ def finetune(
     anchor_diagrams: dict = {}
     anchor_attns: dict = {}
 
-    # Use more prompts for anchors and a lower min_persistence so short sequences
-    # still produce surviving cycles.  The atlas used min_persistence=0.05 on
-    # full prompts; the 5-prompt anchor sample here often has short texts that
-    # produce no cycles above that threshold.
-    anchor_prompts = train_prompts[: min(10, len(train_prompts))]
-    anchor_min_persistence = min(min_persistence, 0.02)  # use masked attn so cycles exist; 0.02 is safe
+    # Use ALL available prompts for anchor computation, sorted longest-first.
+    # Short prompts can produce no H1 cycles even with sink masking; longer
+    # prompts reliably produce cycles in the bridge/cone heads.
+    # We cap at 20 to keep anchor computation fast.
+    anchor_prompts = sorted(train_prompts, key=lambda p: len(p["text"]), reverse=True)
+    anchor_prompts = anchor_prompts[: min(20, len(anchor_prompts))]
+    anchor_min_persistence = min(min_persistence, 0.02)
     anchor_diagrams = compute_anchor_diagrams(
         base_model,
         tokenizer,
