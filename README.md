@@ -1,4 +1,5 @@
-Note: Limited viability. `dev` branch has testing for more models and prompts. I need more compute though.
+Note: Limited viability. `dev` branch has testing for more models and prompts. 
+Note 2: It seems this analysis is only viable for the used model and prompt. Little frustrating, but it's fine. C'est la vie.
 # Attention Sinks Play Topologically Important Roles in Current LLM Architecture
 ## Abstract
 The "Attention Sink" is the phenomenon where Large Language Models 
