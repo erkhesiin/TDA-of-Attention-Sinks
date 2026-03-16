@@ -31,7 +31,11 @@ induction:
 
 regularization:
   method: persistence_diagram # "frobenius" (old) | "persistence_diagram" (new)
-  lambda: 50.0
+  lambda: 5.0                 # BUG FIX: was 50.0, which overwhelmed the task loss gradient.
+                              # λ=5 gives the regularizer roughly equal weight to the task loss.
+                              # Recommended sweep: [1.0, 5.0, 10.0, 25.0] to find the
+                              # Pareto-optimal point between task loss and topology preservation.
+  lambda_sweep: [1.0, 5.0, 10.0, 25.0]
   hub_selection: top_delta_h1 # select heads where |ΔH1| > hub_threshold
   hub_threshold: 0.3
 
