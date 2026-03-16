@@ -411,10 +411,22 @@ def build_control_atlas(
                     "W_O",
                 )
             )
-            if is_attn:
-                std = param.float().std().item()
-                std = std if std > 0 else 0.02  # fallback for near-zero params
-                param.copy_(torch.randn_like(param) * std)
+            if not is_attn:
+                continue
+
+            # Skip quantized storage tensors (Byte/uint8/int8).
+            # 4-bit quantized models store weights as Byte; torch.randn_like on
+            # these raises "normal_kernel_cuda not implemented for Byte".
+            # We randomize only float/half parameters — these are the compute
+            # buffers that actually produce the attention outputs TDA measures.
+            if param.dtype in (torch.uint8, torch.int8, torch.int16, torch.int32):
+                logger.debug("Skipping quantized param %s (dtype=%s)", name, param.dtype)
+                continue
+
+            std = param.float().std().item()
+            std = std if std > 0 else 0.02  # fallback for near-zero params
+            noise = torch.randn(param.shape, dtype=param.dtype, device=param.device) * std
+            param.copy_(noise)
 
     logger.info("Attention weights randomized.  Running TDA scan ...")
 
