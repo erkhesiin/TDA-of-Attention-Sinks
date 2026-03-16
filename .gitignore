@@ -173,9 +173,43 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Cursor  
-#  Cursor is an AI-powered code editor.`.cursorignore` specifies files/directories to 
+# Cursor
+#  Cursor is an AI-powered code editor.`.cursorignore` specifies files/directories to
 #  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# ── TDA-of-Attention-Sinks project-specific ──────────────────────────────────
+
+# Generated results (CSVs, checkpoints, intermediate PNGs) — gitignored except
+# for the .gitkeep that ensures the directory is tracked.
+results/*
+!results/.gitkeep
+
+# Final publication figures are kept (committed explicitly)
+# static/ is tracked in full — do NOT add it here.
+
+# Loose output PNGs from old single-file scripts (root-level artefacts)
+*.png
+!static/*.png
+
+# Model weight caches (HuggingFace hub cache)
+.cache/
+hub/
+*.bin
+*.safetensors
+*.gguf
+
+# bitsandbytes / PEFT artefacts
+adapter_model/
+adapter_config.json
+checkpoint-*/
+
+# Experiment scratch files
+scratch/
+tmp/
+*.tmp
+
+# macOS
+.DS_Store

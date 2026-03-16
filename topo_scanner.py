@@ -16,7 +16,7 @@ from gtda.homology import VietorisRipsPersistence
 import os
 
 # Config
-MODEL_ID = "meta-llama/Llama-3.1-8B-Instruct"
+MODEL_ID = "Qwen/Qwen3-Next-80B-A3B-Instruct"
 PROMPT = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
 RANDOMIZE_WEIGHTS = False  # set true to generate control atlas
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

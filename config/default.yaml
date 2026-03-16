@@ -1,0 +1,53 @@
+# config/default.yaml
+# Central configuration for all TDA-of-Attention-Sinks experiments.
+# All source modules and experiment scripts read from this file — no magic constants in code.
+
+models:
+  - name: meta-llama/Llama-3.1-8B-Instruct
+    alias: llama3
+  - name: mistralai/Mistral-7B-Instruct-v0.2
+    alias: mistral
+  - name: google/gemma-2-9b-it
+    alias: gemma2
+  # Add more as hardware allows
+
+tda:
+  max_filtration: 1.0
+  homology_dim: 1          # H1 cycles
+  symmetrize: true         # Vietoris-Rips requires undirected; directionality is lost (see LIMITATIONS.md)
+  min_persistence: 0.05    # filter trivial cycles
+  bridge_threshold: -0.03  # delta_h1 < threshold → "bridge"
+  cone_threshold: 0.03     # delta_h1 > threshold → "cone"
+
+induction:
+  top_k_edges: 10          # edges to consider per token in skeleton
+  offset: 1                # "next-token" offset to measure induction
+
+regularization:
+  method: persistence_diagram   # "frobenius" (old) | "persistence_diagram" (new)
+  lambda: 50.0
+  hub_selection: top_delta_h1   # select heads where |ΔH1| > hub_threshold
+  hub_threshold: 0.3
+
+fine_tuning:
+  method: lora
+  quantization: 4bit
+  lora_r: 8
+  lora_alpha: 16
+  lora_target_modules:
+    - q_proj
+    - v_proj
+  learning_rate: 1.0e-4
+  steps: 200               # increased from original 60
+  eval_every: 20
+  train_prompts: 40        # up from original handful
+  val_prompts: 20          # held-out validation set
+  max_length: 128          # max token length for tokenizer truncation
+  grad_clip: 1.0           # gradient clipping norm
+
+paths:
+  prompts: data/prompts.json
+  results_dir: results/
+  figures_dir: static/
+
+seed: 42

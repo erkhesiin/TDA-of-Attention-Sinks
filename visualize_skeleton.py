@@ -106,7 +106,7 @@ def plot_skeleton(model, prompt):
 if __name__ == "__main__":
     device = "mps" if torch.backends.mps.is_available() else "cpu"
     model = HookedTransformer.from_pretrained(
-        "meta-llama/Llama-3.1-8B-Instruct", device=device, dtype=torch.float16
+        "Qwen/Qwen3-Next-80B-A3B-Instruct", device=device, dtype=torch.float16
     )
     PROMPT = "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
     plot_skeleton(model, PROMPT)

@@ -1,0 +1,36 @@
+# requirements.txt
+# TDA-of-Attention-Sinks — Python dependencies
+# Install with: pip install -r requirements.txt
+#
+# Hardware notes:
+#   - bitsandbytes requires a CUDA GPU for 4-bit/8-bit quantization.
+#     On Apple Silicon (MPS) use quantization=None in load_model().
+#   - ripser requires Cython at install time:
+#       pip install Cython && pip install ripser
+
+# --- Core ML ---
+torch>=2.2.0
+transformers>=4.40.0
+peft>=0.10.0
+bitsandbytes>=0.43.0
+
+# --- TDA ---
+# ripser replaces giotto-tda: pure pip install, no extra build steps needed.
+# gudhi is retained for optional advanced use (e.g. alpha complexes).
+ripser>=0.6.0
+gudhi>=3.9.0
+persim>=0.3.1
+
+# --- Scientific computing ---
+numpy>=1.26.0
+pandas>=2.2.0
+scipy>=1.13.0
+
+# --- Visualization ---
+matplotlib>=3.8.0
+seaborn>=0.13.0
+networkx>=3.2.0
+
+# --- Config & utilities ---
+pyyaml>=6.0
+tqdm>=4.66.0

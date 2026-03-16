@@ -59,19 +59,19 @@ class TopologicalRegularizer:
 
 def train():
     print(">>> Setting up 4-bit Llama-3 Training...")
-    model_id = "meta-llama/Llama-3.1-8B-Instruct"
+    model_id = "Qwen/Qwen3-Next-80B-A3B-Instruct"
     tokenizer = AutoTokenizer.from_pretrained(model_id)
     tokenizer.pad_token = tokenizer.eos_token
 
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=torch.float16,
-    )
+    # bnb_config = BitsAndBytesConfig(
+    #     load_in_4bit=True,
+    #     bnb_4bit_quant_type="nf4",
+    #     bnb_4bit_compute_dtype=torch.float16,
+    # )
 
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
-        quantization_config=bnb_config,
+        # quantization_config=bnb_config,
         device_map="auto",
         attn_implementation="eager",
     )

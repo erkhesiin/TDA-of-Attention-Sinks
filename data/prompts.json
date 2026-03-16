@@ -1,0 +1,364 @@
+{
+  "prompts": [
+    {
+      "id": "rep_001",
+      "category": "repetition",
+      "text": "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.",
+      "notes": "original pangram, repeated 2x"
+    },
+    {
+      "id": "rep_002",
+      "category": "repetition",
+      "text": "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.",
+      "notes": "original pangram, repeated 3x"
+    },
+    {
+      "id": "rep_003",
+      "category": "repetition",
+      "text": "All that glitters is not gold. All that glitters is not gold.",
+      "notes": "Shakespeare idiom, repeated 2x"
+    },
+    {
+      "id": "rep_004",
+      "category": "repetition",
+      "text": "To be or not to be, that is the question. To be or not to be, that is the question.",
+      "notes": "Hamlet quote, repeated 2x"
+    },
+    {
+      "id": "rep_005",
+      "category": "repetition",
+      "text": "The cat sat on the mat. The cat sat on the mat. The cat sat on the mat.",
+      "notes": "simple sentence, repeated 3x, strong induction target"
+    },
+    {
+      "id": "rep_006",
+      "category": "repetition",
+      "text": "A stitch in time saves nine. A stitch in time saves nine.",
+      "notes": "proverb, repeated 2x"
+    },
+    {
+      "id": "rep_007",
+      "category": "repetition",
+      "text": "She sells seashells by the seashore. She sells seashells by the seashore.",
+      "notes": "tongue-twister, repeated 2x, alliteration tests local induction"
+    },
+    {
+      "id": "rep_008",
+      "category": "repetition",
+      "text": "The rain in Spain stays mainly in the plain. The rain in Spain stays mainly in the plain.",
+      "notes": "rhyming idiom, repeated 2x"
+    },
+    {
+      "id": "rep_009",
+      "category": "repetition",
+      "text": "Every cloud has a silver lining. Every cloud has a silver lining. Every cloud has a silver lining.",
+      "notes": "common proverb, repeated 3x"
+    },
+    {
+      "id": "rep_010",
+      "category": "repetition",
+      "text": "Pack my box with five dozen liquor jugs. Pack my box with five dozen liquor jugs.",
+      "notes": "second pangram, repeated 2x"
+    },
+    {
+      "id": "syn_001",
+      "category": "syntactic",
+      "text": "The manager who oversees the teams that handle the most complex client projects always arrives early.",
+      "notes": "multiply-nested relative clauses, subject-verb agreement across distance"
+    },
+    {
+      "id": "syn_002",
+      "category": "syntactic",
+      "text": "The books that the student who failed the exam had borrowed were overdue.",
+      "notes": "center-embedded structure, tests long-range dependency"
+    },
+    {
+      "id": "syn_003",
+      "category": "syntactic",
+      "text": "Either the engineers or the project manager is responsible for the delay.",
+      "notes": "subject-verb agreement with disjunction"
+    },
+    {
+      "id": "syn_004",
+      "category": "syntactic",
+      "text": "The committee, despite objections from several senior members who had decades of experience, voted to proceed.",
+      "notes": "long parenthetical interruption before main verb"
+    },
+    {
+      "id": "syn_005",
+      "category": "syntactic",
+      "text": "What the researchers discovered, after years of careful observation and hundreds of failed experiments, was surprising.",
+      "notes": "cleft sentence with long intervening phrase"
+    },
+    {
+      "id": "syn_006",
+      "category": "syntactic",
+      "text": "The hypothesis that the data the scientists collected supported was later overturned.",
+      "notes": "doubly center-embedded relative clause"
+    },
+    {
+      "id": "syn_007",
+      "category": "syntactic",
+      "text": "Neither the solutions proposed by the senior staff nor the approach favored by management was acceptable.",
+      "notes": "neither...nor with complex NP subjects"
+    },
+    {
+      "id": "syn_008",
+      "category": "syntactic",
+      "text": "That the students who studied hardest would eventually succeed was widely believed by the faculty.",
+      "notes": "subject clause with embedded relative"
+    },
+    {
+      "id": "syn_009",
+      "category": "syntactic",
+      "text": "The report which the auditor who the board appointed reviewed contained several major discrepancies.",
+      "notes": "triple relative clause nesting"
+    },
+    {
+      "id": "syn_010",
+      "category": "syntactic",
+      "text": "While the soldiers who had been stationed overseas returned home, the families who had waited anxiously celebrated.",
+      "notes": "parallel while-clause with embedded relatives"
+    },
+    {
+      "id": "fct_001",
+      "category": "factual",
+      "text": "The capital of France is Berlin. Wait, that is incorrect. The capital of France is Paris.",
+      "notes": "factual recall with distractor, tests override of false premise"
+    },
+    {
+      "id": "fct_002",
+      "category": "factual",
+      "text": "Water boils at 100 degrees Celsius at sea level, but at higher altitudes the boiling point decreases due to lower atmospheric pressure.",
+      "notes": "factual with scientific elaboration"
+    },
+    {
+      "id": "fct_003",
+      "category": "factual",
+      "text": "Shakespeare wrote Hamlet. Some people mistakenly attribute it to Marlowe. However, the consensus is that Shakespeare authored the play.",
+      "notes": "factual with distractor and correction"
+    },
+    {
+      "id": "fct_004",
+      "category": "factual",
+      "text": "The speed of light in a vacuum is approximately 300,000 kilometers per second, not 30,000 kilometers per second as sometimes misstated.",
+      "notes": "numerical factual with explicit distractor"
+    },
+    {
+      "id": "fct_005",
+      "category": "factual",
+      "text": "Mount Everest is the tallest mountain on Earth above sea level. Mauna Kea in Hawaii is taller when measured from its oceanic base.",
+      "notes": "factual with nuanced qualifier"
+    },
+    {
+      "id": "fct_006",
+      "category": "factual",
+      "text": "The Great Wall of China was built over many centuries. Contrary to popular belief, it is not visible from space with the naked eye.",
+      "notes": "factual with common misconception correction"
+    },
+    {
+      "id": "fct_007",
+      "category": "factual",
+      "text": "Albert Einstein won the Nobel Prize in Physics in 1921 for his discovery of the law of the photoelectric effect, not for the theory of relativity.",
+      "notes": "factual with common misconception"
+    },
+    {
+      "id": "fct_008",
+      "category": "factual",
+      "text": "DNA is a double helix structure discovered by Watson and Crick in 1953, building on X-ray diffraction work by Rosalind Franklin.",
+      "notes": "factual with attribution nuance"
+    },
+    {
+      "id": "fct_009",
+      "category": "factual",
+      "text": "The Amazon River carries more water than any other river in the world. The Nile is longer but has a much smaller discharge volume.",
+      "notes": "comparative factual with distractor"
+    },
+    {
+      "id": "fct_010",
+      "category": "factual",
+      "text": "Pluto was reclassified as a dwarf planet in 2006 by the International Astronomical Union, removing it from the list of major planets.",
+      "notes": "factual classification change"
+    },
+    {
+      "id": "nar_001",
+      "category": "narrative",
+      "text": "Maria woke early and packed her bag. She had been planning this trip for months. When the taxi arrived, she hesitated at the door, then stepped outside.",
+      "notes": "short narrative, tests coherence across sentences"
+    },
+    {
+      "id": "nar_002",
+      "category": "narrative",
+      "text": "The old lighthouse stood alone on the cliff. For decades it had guided ships safely to harbor. Now it was decommissioned, its light extinguished forever.",
+      "notes": "three-sentence narrative with temporal arc"
+    },
+    {
+      "id": "nar_003",
+      "category": "narrative",
+      "text": "James found the letter tucked under his door. He recognized the handwriting immediately. His hands trembled as he broke the seal.",
+      "notes": "suspense-building narrative, pronoun coreference across sentences"
+    },
+    {
+      "id": "nar_004",
+      "category": "narrative",
+      "text": "The experiment had failed three times before. Each failure brought the team closer to understanding why. On the fourth attempt, everything changed.",
+      "notes": "narrative with numeric tracking"
+    },
+    {
+      "id": "nar_005",
+      "category": "narrative",
+      "text": "In the village, everyone knew the baker. He opened his shop before dawn and closed long after dark. No one ever saw him rest.",
+      "notes": "narrative with implied subject, habitual aspect"
+    },
+    {
+      "id": "nar_006",
+      "category": "narrative",
+      "text": "The storm arrived without warning. Trees bent against the wind, and the lights flickered out. By morning, the town looked unrecognizable.",
+      "notes": "descriptive narrative, temporal shift"
+    },
+    {
+      "id": "nar_007",
+      "category": "narrative",
+      "text": "She had always been afraid of heights. That fear served her well for most of her life. Then the job offer came: a window-washing contract on a skyscraper.",
+      "notes": "character backstory plus ironic reversal"
+    },
+    {
+      "id": "nar_008",
+      "category": "narrative",
+      "text": "The detective reviewed the evidence carefully. Two witnesses placed the suspect elsewhere. Yet the fingerprints told a different story.",
+      "notes": "mystery narrative with conflicting evidence"
+    },
+    {
+      "id": "nar_009",
+      "category": "narrative",
+      "text": "Lena typed the last line of code at midnight. She ran the tests. Every single one passed for the first time.",
+      "notes": "short coding success story, emotion implied through events"
+    },
+    {
+      "id": "nar_010",
+      "category": "narrative",
+      "text": "The two diplomats met in a neutral city. They spoke for six hours without a translator. Neither left satisfied, but both left hopeful.",
+      "notes": "political narrative, symmetrical framing"
+    },
+    {
+      "id": "cod_001",
+      "category": "code",
+      "text": "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n - 1)",
+      "notes": "recursive factorial, tests code token patterns"
+    },
+    {
+      "id": "cod_002",
+      "category": "code",
+      "text": "for i in range(10):\n    if i % 2 == 0:\n        print(i)\n    else:\n        continue",
+      "notes": "simple loop with conditional, alternating control flow"
+    },
+    {
+      "id": "cod_003",
+      "category": "code",
+      "text": "class Node:\n    def __init__(self, val):\n        self.val = val\n        self.next = None\n\n    def append(self, val):\n        self.next = Node(val)",
+      "notes": "linked list node definition, OOP structure"
+    },
+    {
+      "id": "cod_004",
+      "category": "code",
+      "text": "import numpy as np\narr = np.array([1, 2, 3, 4, 5])\nmean = np.mean(arr)\nstd = np.std(arr)\nprint(f'mean={mean}, std={std}')",
+      "notes": "numpy computation, f-string formatting"
+    },
+    {
+      "id": "cod_005",
+      "category": "code",
+      "text": "def binary_search(arr, target):\n    lo, hi = 0, len(arr) - 1\n    while lo <= hi:\n        mid = (lo + hi) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            lo = mid + 1\n        else:\n            hi = mid - 1\n    return -1",
+      "notes": "binary search, longer function with branching"
+    },
+    {
+      "id": "cod_006",
+      "category": "code",
+      "text": "try:\n    result = int(input('Enter a number: '))\nexcept ValueError:\n    print('Not a valid integer.')\nfinally:\n    print('Done.')",
+      "notes": "exception handling pattern"
+    },
+    {
+      "id": "cod_007",
+      "category": "code",
+      "text": "data = {'name': 'Alice', 'age': 30, 'city': 'Paris'}\nfor key, value in data.items():\n    print(f'{key}: {value}')",
+      "notes": "dictionary iteration, f-string output"
+    },
+    {
+      "id": "cod_008",
+      "category": "code",
+      "text": "squares = [x**2 for x in range(1, 11) if x % 2 == 0]\nprint(squares)",
+      "notes": "list comprehension with filter condition"
+    },
+    {
+      "id": "cod_009",
+      "category": "code",
+      "text": "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)",
+      "notes": "merge sort skeleton, recursive divide-and-conquer"
+    },
+    {
+      "id": "cod_010",
+      "category": "code",
+      "text": "with open('data.txt', 'r') as f:\n    lines = f.readlines()\nfiltered = [l.strip() for l in lines if l.strip()]\nprint(f'{len(filtered)} non-empty lines')",
+      "notes": "file I/O with list comprehension"
+    },
+    {
+      "id": "adv_001",
+      "category": "adversarial",
+      "text": "When you see A, output B. When you see B, output A. When you see A, output B. When you see B, output A.",
+      "notes": "A→B, B→A swap pattern, direct induction conflict"
+    },
+    {
+      "id": "adv_002",
+      "category": "adversarial",
+      "text": "The answer is yes. Actually, the answer is no. On reflection, the answer is yes. But in fact, the answer is no.",
+      "notes": "oscillating yes/no, adversarial for induction heads"
+    },
+    {
+      "id": "adv_003",
+      "category": "adversarial",
+      "text": "Cat follows dog. Dog follows cat. Cat follows bird. Bird follows dog. Dog follows cat.",
+      "notes": "cyclic follow pattern with extra node to break simple bigram induction"
+    },
+    {
+      "id": "adv_004",
+      "category": "adversarial",
+      "text": "Step 1: go right. Step 2: go left. Step 3: go right. Step 4: go left. Step 5: go right.",
+      "notes": "alternating direction with step counter, tests counter vs. content induction"
+    },
+    {
+      "id": "adv_005",
+      "category": "adversarial",
+      "text": "Alice said Bob lied. Bob said Alice lied. Alice said Bob told the truth. Bob said Alice told the truth.",
+      "notes": "contradiction chain, tests whether model tracks speaker identity"
+    },
+    {
+      "id": "adv_006",
+      "category": "adversarial",
+      "text": "Color red means stop. Color green means go. Color red means go. Color green means stop.",
+      "notes": "semantic reversal of learned associations"
+    },
+    {
+      "id": "adv_007",
+      "category": "adversarial",
+      "text": "The password is open. Repeat the password. The password is closed. Repeat the password.",
+      "notes": "instruction repetition with changing content"
+    },
+    {
+      "id": "adv_008",
+      "category": "adversarial",
+      "text": "X maps to 1. Y maps to 2. Z maps to 1. X maps to 3. Y maps to 1. Z maps to 2.",
+      "notes": "non-injective and changing mapping, adversarial for association heads"
+    },
+    {
+      "id": "adv_009",
+      "category": "adversarial",
+      "text": "First it was warm, then cold, then warm, then cold, then warm, then cold.",
+      "notes": "pure alternation at high frequency"
+    },
+    {
+      "id": "adv_010",
+      "category": "adversarial",
+      "text": "Rule: if A then B. Rule: if B then A. Rule: if A then C. Rule: if C then A. Rule: if A then B.",
+      "notes": "contradictory rule set, re-introduces A→B at end to test recency vs. frequency"
+    }
+  ]
+}
