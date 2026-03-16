@@ -150,6 +150,16 @@ def _parse_args() -> argparse.Namespace:
             "hub heads.  Only useful for quick debugging."
         ),
     )
+    parser.add_argument(
+        "--recompute-atlas",
+        action="store_true",
+        dest="recompute_atlas",
+        default=False,
+        help=(
+            "Delete any cached atlas_for_cf.csv and recompute from scratch. "
+            "Use this after changing TDA parameters (e.g. min_persistence)."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -449,6 +459,13 @@ def main() -> None:
         log.warning("Skipping atlas step.  Using fallback hub heads: %s", hub_heads)
 
     else:
+        # Delete cached atlas if --recompute-atlas is set
+        if args.recompute_atlas:
+            cached = out_dir / "atlas_for_cf.csv"
+            if cached.exists():
+                cached.unlink()
+                log.info("Deleted cached atlas at %s (--recompute-atlas)", cached)
+
         agg_df = _build_or_load_atlas(
             model,
             tokenizer,

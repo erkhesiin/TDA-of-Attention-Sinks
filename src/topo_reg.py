@@ -665,7 +665,7 @@ def finetune(
     # full prompts; the 5-prompt anchor sample here often has short texts that
     # produce no cycles above that threshold.
     anchor_prompts = train_prompts[: min(10, len(train_prompts))]
-    anchor_min_persistence = min(min_persistence, 0.01)
+    anchor_min_persistence = min(min_persistence, 0.001)  # short CF prompts need very low threshold
     anchor_diagrams = compute_anchor_diagrams(
         base_model,
         tokenizer,
@@ -701,12 +701,21 @@ def finetune(
                 if k not in anchor_attns:
                     anchor_attns[k] = []
                 anchor_attns[k].append(mean_col)
-        # Average over anchor prompts; keep as 1-D numpy array (seq-length agnostic
-        # comparison happens in frobenius_loss via interpolation below)
-        anchor_attns = {
-            k: np.mean(np.stack(vs, axis=0), axis=0).astype(np.float32)
-            for k, vs in anchor_attns.items()
-        }
+        # Interpolate all per-prompt vectors to a fixed reference length (64)
+        # before averaging, so np.stack doesn't crash on variable sequence lengths.
+        _REF_LEN = 64
+        averaged = {}
+        for k, vs in anchor_attns.items():
+            resampled = []
+            for v in vs:
+                t = torch.tensor(v, dtype=torch.float32).view(1, 1, -1)
+                r = torch.nn.functional.interpolate(
+                    t, size=_REF_LEN, mode="linear", align_corners=False
+                ).view(_REF_LEN).numpy()
+                r = r / (r.sum() + 1e-9)
+                resampled.append(r)
+            averaged[k] = np.mean(np.stack(resampled, axis=0), axis=0).astype(np.float32)
+        anchor_attns = averaged
 
     # --- Wrap with LoRA ---
     peft_config = LoraConfig(
