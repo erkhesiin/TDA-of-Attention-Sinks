@@ -1,0 +1,7 @@
+model,alias,total_heads,frac_bridge,frac_cone,frac_neutral,mean_stability,mean_delta_h1_bridge,mean_delta_h1_cone,mean_induction_normal,mean_induction_masked,mean_induction_delta,n_induction_heads,bridge_cone_consistent,control_max_abs_delta,contrast_trained_vs_control
+meta-llama/Llama-3.1-8B-Instruct,llama3,1024,0.1514,0.001,0.8477,0.7884,-0.04273,0.07085,0.0006,0.0007,0.0002,1,True,0.09467,0.0
+mistralai/Mistral-7B-Instruct-v0.3,mistral,1024,0.1445,0.0049,0.8506,0.7133,-0.03794,0.06862,0.0053,0.0064,0.0011,2,True,0.08595,0.0
+google/gemma-2-9b-it,gemma2,672,0.1905,0.0119,0.7976,0.6998,-0.0392,0.05122,0.0003,0.0004,0.0001,1,True,0.08617,0.0
+Qwen/Qwen2.5-7B-Instruct,qwen25,784,0.0293,0.0038,0.9668,0.7605,-0.03814,0.06035,0.0008,0.0012,0.0004,2,False,0.02564,0.03891
+Qwen/Qwen3-8B,qwen3,1152,0.263,0.0035,0.7335,0.6909,-0.04101,0.05778,0.0051,0.0084,0.0033,3,True,0.07654,0.0
+microsoft/Phi-4-mini-instruct,phi4_mini,768,0.1419,0.0052,0.8529,0.7625,-0.03865,0.05072,0.0011,0.0017,0.0007,1,True,0.07695,0.0
