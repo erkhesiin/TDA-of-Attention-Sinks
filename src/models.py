@@ -69,7 +69,7 @@ def load_model(
         model_name,
         quantization_config=bnb_config,
         device_map="auto",
-        torch_dtype=torch.float16 if quantization is None else None,
+        torch_dtype=torch.bfloat16 if quantization is None else None,
         attn_implementation="eager",  # required to get per-head attention tensors
     )
 
