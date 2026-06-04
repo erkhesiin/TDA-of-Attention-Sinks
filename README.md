@@ -1,6 +1,6 @@
 Note: Limited viability. `dev` branch has testing for more models and prompts. 
 Note 2: It seems this analysis is only viable for the used model and prompt. Little frustrating, but it's fine. C'est la vie.
-# Attention Sinks Play Topologically Important Roles in Current LLM Architecture
+# Attention Sinks (Don't*) Play Topologically Important Roles in Current LLM Architecture
 ## Abstract
 The "Attention Sink" is the phenomenon where Large Language Models 
 (LLMs) allocate a disproportionate amount of attention probability
